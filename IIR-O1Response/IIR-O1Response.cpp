@@ -132,6 +132,10 @@ void filter1_filterBiquad(filter1_executionState * pExecState)
 #define LOOP	(2)
 #define PERIOD	(50)
 
+#define SQUARE	(0)
+#define SAWUP	(0)
+#define SAWDOWN	(1)
+
 int _tmain(int argc, _TCHAR* argv[])
 {
 	filter1Type* filter = filter1_create();
@@ -139,6 +143,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	printf("Sample\tInput\tOutput\n");
 	int count = 0;
 	for (int i = 0; i < LOOP; i++) {
+#if (SQUARE)
 		float in = 1.0f;
 		for (int j = 0; j < PERIOD / 2; j++) {
 			filter1_writeInput(filter, in);
@@ -153,6 +158,25 @@ int _tmain(int argc, _TCHAR* argv[])
 			printf("%d\t%f\t%f\n", count, in, out);
 			count++;
 		}
+#elif (SAWUP)
+		float in = 0.0f;
+		for (int j = 0; j < PERIOD; j++) {
+			filter1_writeInput(filter, in);
+			float out = filter1_readOutput(filter);
+			printf("%d\t%f\t%f\n", count, in, out);
+			in += 1.0f / PERIOD;
+			count++;
+		}
+#elif (SAWDOWN)
+		float in = 1.0f;
+		for (int j = 0; j < PERIOD; j++) {
+			filter1_writeInput(filter, in);
+			float out = filter1_readOutput(filter);
+			printf("%d\t%f\t%f\n", count, in, out);
+			in -= 1.0f / PERIOD;
+			count++;
+		}
+#endif
 	}
 
 	return 0;
